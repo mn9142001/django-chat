@@ -27,8 +27,7 @@ class MessagesView(viewsets.ViewSet):
 		if ser.is_valid():
 			obj = ser.save(sender=request.user)
 			if request.data.get('media') and int(request.data.get('media')) > 0:
-				for x in range(int(request.data.get('media'))):
-					MessageMedia.objects.create(media=request.data.get('img_' + str(x)), message = obj)
+				MessageMedia.objects.bulk_create([MessageMedia(media=request.data.get(f"img_{str(x)}"), message = obj) for x in range(request.data.get('media'))])
 			afterMessage(obj)
 			return response.Response({'message': "wait"}, status = status.HTTP_200_OK)
 
