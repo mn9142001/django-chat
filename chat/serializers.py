@@ -43,23 +43,10 @@ class MessageSerializer(BaseMessageSerializer):
 		obj = super().create(data)
 		if _files:
 			MessageFile.objects.bulk_create([MessageFile(img = file, message=obj) for file in _files])
-
-		afterMessage(MessageSerializer(obj).data)
+		self._data = MessageSerializer(obj).data
+		afterMessage(self._data)
 		return obj
 
-class ChatSerializer(serializers.Serializer):
-	messages = serializers.SerializerMethodField(method_name='get_messages')
-	partner = serializers.SerializerMethodField(method_name='get_partner')
-
-	def get_partner(self, partner):
-		return SnippetUserSerializer(partner).data
-
-	def get_messages(self, partner):
-		messages = Message.objects.filter((Q(receiver = self.context.get('request').user, sender = partner) | Q(sender=self.context.get('request').user, receiver = partner)))
-		return MessageSerializer(messages, many=True).data
-
-	class Meta:
-		fields = ('messages', 'partner',)
 
 class MessageListSerializer(BaseMessageSerializer):
 	last_m = serializers.SerializerMethodField(method_name='last_message')
