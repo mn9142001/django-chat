@@ -19,8 +19,6 @@ class BaseMessageSerializer(serializers.ModelSerializer):
 	def request(self):
 		return self.context.get('request')
 
-
-
 class MessageReply(BaseMessageSerializer):
 	class Meta(BaseMessageSerializer.Meta):
 		model = Message
